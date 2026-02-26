@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "768207906035",
+    "project_id": "epairx",
+    "storage_bucket": "epairx.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:768207906035:android:ce5f81be3a97ad9dd28386",
+        "android_client_info": {
+          "package_name": "com.epair.epairsuyash"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCu6_8GLey4LNXffEaMMREPSEqLhbkwGMI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
