@@ -3,6 +3,7 @@ import 'package:fl_chart/fl_chart.dart';
 import '../../../core/data/mock_data.dart';
 import '../../../core/models/models.dart';
 import '../../../core/theme/app_colors.dart';
+import 'technician_dashboard.dart';
 
 class PartnerPanel extends StatefulWidget {
   const PartnerPanel({
@@ -35,302 +36,322 @@ class _PartnerPanelState extends State<PartnerPanel> {
     super.initState();
     _activeJobs = MockData.bookings
         .where((b) => b.status != 'completed')
-        .map((b) => Booking(
-              id: b.id,
-              customerName: b.customerName,
-              providerName: b.providerName,
-              serviceName: b.serviceName,
-              date: b.date,
-              amount: b.amount,
-              status: b.status,
-            ))
         .toList();
   }
 
-  void _updateStatus(String id) {
-    setState(() {
-      _activeJobs = _activeJobs.map((job) {
-        if (job.id != id) return job;
-        final next = {
-          'pending': 'accepted',
-          'accepted': 'in-progress',
-          'in-progress': 'completed',
-        }[job.status];
-        return job.copyWith(status: next ?? job.status);
-      }).where((j) => j.status != 'completed').toList();
-    });
-  }
+  // ============================================================
+  // BUILD
+  // ============================================================
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+
+    if (width > 900) {
+      return Container(
+        color: const Color(0xFF0F172A),
+        child: SafeArea(
+          child: Row(
+            children: [
+              _buildProfilePanel(),
+              Expanded(child: _buildDashboard(isMobile: false)),
+            ],
+          ),
+        ),
+      );
+    }
+
+    return Scaffold(
+      backgroundColor: const Color(0xFF0F172A),
+      drawer: Drawer(
+        backgroundColor: const Color(0xFF111827),
+        child: SafeArea(child: _buildProfilePanel()),
+      ),
+      body: SafeArea(
+        child: _buildDashboard(isMobile: true),
+      ),
+    );
+  }
+
+  // ============================================================
+  // PROFILE PANEL
+  // ============================================================
+
+  Widget _buildProfilePanel() {
     return Container(
-      color: const Color(0xFF0F172A),
-      child: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(24),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      Container(
-                        width: 48,
-                        height: 48,
-                        decoration: BoxDecoration(
-                          color: AppColors.epairRed,
-                          borderRadius: BorderRadius.circular(16),
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppColors.epairRed.withValues(alpha: 0.3),
-                              blurRadius: 16,
-                            ),
-                          ],
-                        ),
-                        child: const Icon(
-                          Icons.build_circle,
-                          color: Colors.white,
-                          size: 24,
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'ePair Tech Hub',
-                            style: TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w900,
-                              letterSpacing: 2,
-                              color: AppColors.slate500,
-                            ),
-                          ),
-                          Row(
-                            children: [
-                              Container(
-                                width: 8,
-                                height: 8,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: _isOnline
-                                      ? AppColors.emerald500
-                                      : AppColors.slate600,
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              Text(
-                                _isOnline ? 'ONLINE' : 'OFFLINE',
-                                style: const TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w900,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      TextButton(
-                        onPressed: () =>
-                            widget.onAppModeChanged(AppMode.customer),
-                        child: Text(
-                          'Go to User App',
-                          style: TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: 1,
-                            color: AppColors.slate400,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      ElevatedButton(
-                        onPressed: () =>
-                            setState(() => _isOnline = !_isOnline),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: _isOnline
-                              ? AppColors.rose500.withValues(alpha: 0.2)
-                              : AppColors.epairRed,
-                          foregroundColor: _isOnline
-                              ? AppColors.rose400
-                              : Colors.white,
-                        ),
-                        child: Text(
-                          _isOnline ? 'EXIT WORK' : 'START',
-                          style: const TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: 1,
-                          ),
-                        ),
-                      ),
-                    ],
+      width: 260,
+      padding: const EdgeInsets.all(24),
+      decoration: const BoxDecoration(
+        color: Color(0xFF111827),
+        border: Border(
+          right: BorderSide(color: Color(0xFF1F2937)),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          const SizedBox(height: 40),
+
+          const CircleAvatar(
+            radius: 48,
+            backgroundImage:
+            NetworkImage('https://i.pravatar.cc/150?img=3'),
+          ),
+
+          const SizedBox(height: 16),
+
+          const Text(
+            "Rahul Sharma",
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+
+          const SizedBox(height: 6),
+
+          const Text(
+            "AC Technician",
+            style: TextStyle(
+              color: Color(0xFF9CA3AF),
+              fontSize: 12,
+              letterSpacing: 1,
+            ),
+          ),
+
+          const SizedBox(height: 30),
+
+          _profileStat("Rating", "4.8 ⭐"),
+          _profileStat("Jobs Done", "126"),
+          _profileStat("Experience", "3 Years"),
+
+          const SizedBox(height: 30),
+
+          ElevatedButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const TechnicianDashboard(),
+                ),
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.epairRed,
+              minimumSize: const Size(double.infinity, 45),
+            ),
+            child: const Text("View Requests"),
+          ),
+
+          const Spacer(),
+
+          ElevatedButton(
+            onPressed: () {},
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.grey.shade800,
+              minimumSize: const Size(double.infinity, 45),
+            ),
+            child: const Text("Edit Profile"),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _profileStat(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: Column(
+        children: [
+          Text(
+            value,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          Text(
+            label,
+            style: const TextStyle(
+              color: Color(0xFF6B7280),
+              fontSize: 11,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ============================================================
+  // DASHBOARD
+  // ============================================================
+
+  Widget _buildDashboard({required bool isMobile}) {
+    return Column(
+      children: [
+        _buildHeader(isMobile),
+        Expanded(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 32),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildRevenueCard(),
+                const SizedBox(height: 40),
+                _buildActiveJobs(),
+                const SizedBox(height: 60),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildHeader(bool isMobile) {
+    return Padding(
+      padding: const EdgeInsets.all(24),
+      child: Row(
+        children: [
+          if (isMobile)
+            Builder(
+              builder: (context) => IconButton(
+                icon: const Icon(Icons.menu, color: Colors.white),
+                onPressed: () => Scaffold.of(context).openDrawer(),
+              ),
+            ),
+
+          const Text(
+            "Technician Dashboard",
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+
+          const Spacer(),
+
+          ElevatedButton(
+            onPressed: () =>
+                setState(() => _isOnline = !_isOnline),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.epairRed,
+            ),
+            child: Text(_isOnline ? "Go Offline" : "Go Online"),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRevenueCard() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(28),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1E293B),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            "WEEKLY REVENUE",
+            style: TextStyle(
+              color: Colors.white70,
+              fontSize: 12,
+              letterSpacing: 1.5,
+            ),
+          ),
+          const SizedBox(height: 10),
+          const Text(
+            "₹1,650",
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 32,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 20),
+          SizedBox(
+            height: 120,
+            child: LineChart(
+              LineChartData(
+                gridData: const FlGridData(show: false),
+                titlesData: const FlTitlesData(show: false),
+                borderData: FlBorderData(show: false),
+                lineBarsData: [
+                  LineChartBarData(
+                    spots: _earningsData
+                        .asMap()
+                        .entries
+                        .map((e) => FlSpot(
+                      e.key.toDouble(),
+                      (e.value['amount'] as num)
+                          .toDouble(),
+                    ))
+                        .toList(),
+                    isCurved: true,
+                    color: AppColors.epairRed,
+                    barWidth: 3,
+                    dotData: const FlDotData(show: false),
                   ),
                 ],
               ),
             ),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 32),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(32),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF1E293B),
-                        border: Border.all(color: const Color(0xFF334155)),
-                        borderRadius: BorderRadius.circular(24),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.2),
-                            blurRadius: 20,
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'WEEKLY REVENUE',
-                            style: TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w900,
-                              letterSpacing: 2,
-                              color: AppColors.slate500,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          const Text(
-                            '\$1,650.40',
-                            style: TextStyle(
-                              fontSize: 36,
-                              fontWeight: FontWeight.w900,
-                              color: Colors.white,
-                            ),
-                          ),
-                          const SizedBox(height: 32),
-                          SizedBox(
-                            height: 160,
-                            child: LineChart(
-                              LineChartData(
-                                gridData: const FlGridData(show: false),
-                                titlesData: const FlTitlesData(show: false),
-                                borderData: FlBorderData(show: false),
-                                lineBarsData: [
-                                  LineChartBarData(
-                                    spots: _earningsData
-                                        .asMap()
-                                        .entries
-                                        .map((e) => FlSpot(
-                                            e.key.toDouble(),
-                                            (e.value['amount'] as num)
-                                                .toDouble()))
-                                        .toList(),
-                                    isCurved: true,
-                                    color: AppColors.epairRed,
-                                    barWidth: 4,
-                                    dotData: const FlDotData(show: false),
-                                    belowBarData: BarAreaData(
-                                      show: true,
-                                      color: AppColors.epairRed
-                                          .withValues(alpha: 0.2),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 40),
-                    Text(
-                      'ACTIVE TASKS',
-                      style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: 2,
-                        color: AppColors.slate500,
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    ..._activeJobs.map((job) {
-                      return Container(
-                        margin: const EdgeInsets.only(bottom: 24),
-                        padding: const EdgeInsets.all(28),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF1E293B).withValues(alpha: 0.5),
-                          border: Border.all(color: const Color(0xFF334155)),
-                          borderRadius: BorderRadius.circular(24),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    job.serviceName,
-                                    style: const TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w900,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ),
-                                Text(
-                                  '\$${job.amount.toStringAsFixed(0)}',
-                                  style: const TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.w900,
-                                    color: AppColors.emerald500,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 24),
-                            SizedBox(
-                              width: double.infinity,
-                              child: ElevatedButton(
-                                onPressed: () => _updateStatus(job.id),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: AppColors.epairRed,
-                                  padding: const EdgeInsets.symmetric(
-                                      vertical: 16),
-                                ),
-                                child: Text(
-                                  job.status == 'pending'
-                                      ? 'Accept'
-                                      : 'Update Status',
-                                  style: const TextStyle(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w900,
-                                    letterSpacing: 1,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    }),
-                    const SizedBox(height: 80),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
+    );
+  }
+
+  Widget _buildActiveJobs() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          "ACTIVE JOBS",
+          style: TextStyle(
+            color: Colors.white70,
+            fontSize: 12,
+            letterSpacing: 1.5,
+          ),
+        ),
+        const SizedBox(height: 20),
+        ..._activeJobs.take(3).map((job) {
+          return Container(
+            margin: const EdgeInsets.only(bottom: 16),
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: const Color(0xFF1E293B),
+              borderRadius: BorderRadius.circular(18),
+            ),
+            child: Column(
+              crossAxisAlignment:
+              CrossAxisAlignment.start,
+              children: [
+                Text(
+                  job.serviceName,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  "₹${job.amount}",
+                  style: TextStyle(
+                    color: AppColors.emerald500,
+                  ),
+                ),
+              ],
+            ),
+          );
+        }),
+      ],
     );
   }
 }
