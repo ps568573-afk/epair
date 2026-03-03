@@ -27,8 +27,7 @@ class _CustomerAppState extends State<CustomerApp> {
   CustomerTab _activeTab = CustomerTab.home;
   String? _selectedCategoryId;
   Service? _bookingService;
-  int _activeRepairsCount =
-      0; // could be from state; for now derived from mock
+  int _activeRepairsCount = 0;
 
   @override
   void initState() {
@@ -60,76 +59,16 @@ class _CustomerAppState extends State<CustomerApp> {
             shape: BoxShape.circle,
             border: Border.all(color: AppColors.epairRed, width: 4),
           ),
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              Positioned(
-                top: 2,
-                child: Container(
-                  width: 6,
-                  height: 20,
-                  decoration: BoxDecoration(
-                    color: AppColors.epairRed,
-                    borderRadius: BorderRadius.circular(3),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 8,
-                child: Container(
-                  width: 16,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: AppColors.epairRed,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-              ),
-            ],
-          ),
         ),
-        const SizedBox(width: 4),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
-              children: [
-                const Text(
-                  'pair',
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.w900,
-                    color: AppColors.epairNavy,
-                    fontStyle: FontStyle.italic,
-                  ),
-                ),
-                const SizedBox(width: 4),
-                Container(
-                  width: 24,
-                  height: 24,
-                  decoration: BoxDecoration(
-                    color: AppColors.epairNavy,
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: const Icon(
-                    Icons.check,
-                    color: AppColors.epairYellow,
-                    size: 12,
-                  ),
-                ),
-              ],
-            ),
-            Text(
-              'FAST & FAIR, ELECTRONICS REPAIR..',
-              style: TextStyle(
-                fontSize: 7,
-                fontWeight: FontWeight.w700,
-                color: AppColors.epairRed,
-                letterSpacing: 2,
-              ),
-            ),
-          ],
+        const SizedBox(width: 8),
+        const Text(
+          "pair",
+          style: TextStyle(
+            fontSize: 28,
+            fontWeight: FontWeight.w900,
+            fontStyle: FontStyle.italic,
+            color: AppColors.epairNavy,
+          ),
         ),
       ],
     );
@@ -145,14 +84,16 @@ class _CustomerAppState extends State<CustomerApp> {
       );
     }
 
-    return Container(
-      color: AppColors.slate50,
-      child: SafeArea(
+    return Scaffold(
+      backgroundColor: AppColors.slate50,
+      body: SafeArea(
         child: Column(
           children: [
+            /// HEADER
             Container(
               color: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              padding:
+              const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -160,13 +101,12 @@ class _CustomerAppState extends State<CustomerApp> {
                   IconButton(
                     onPressed: () {},
                     icon: const Icon(Icons.notifications_outlined),
-                    style: IconButton.styleFrom(
-                      backgroundColor: AppColors.slate50,
-                    ),
                   ),
                 ],
               ),
             ),
+
+            /// BODY
             Expanded(
               child: Container(
                 color: Colors.white,
@@ -177,7 +117,8 @@ class _CustomerAppState extends State<CustomerApp> {
                       selectedCategoryId: _selectedCategoryId,
                       onCategorySelected: (id) =>
                           setState(() => _selectedCategoryId = id),
-                      onFixNow: (s) => setState(() => _bookingService = s),
+                      onFixNow: (s) =>
+                          setState(() => _bookingService = s),
                     ),
                     AiDiagnosisTab(
                       onFindService: () =>
@@ -195,29 +136,29 @@ class _CustomerAppState extends State<CustomerApp> {
                 ),
               ),
             ),
+
+            /// BOTTOM NAVIGATION
             Container(
               height: 88,
               decoration: BoxDecoration(
                 color: Colors.white,
-                border: Border(top: BorderSide(color: AppColors.slate100)),
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.05),
-                    blurRadius: 40,
-                    offset: const Offset(0, -10),
-                  ),
-                ],
+                border: Border(
+                  top: BorderSide(color: AppColors.slate100),
+                ),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   _navItem(CustomerTab.home, Icons.home, 'Home'),
-                  _navItem(CustomerTab.aiDiagnosis, Icons.auto_awesome, 'AI Diag'),
-                  _navItem(CustomerTab.bookings, Icons.build, 'Booking',
+                  _navItem(CustomerTab.aiDiagnosis,
+                      Icons.auto_awesome, 'AI'),
+                  _navItem(CustomerTab.bookings,
+                      Icons.build, 'Booking',
                       showBadge: _activeRepairsCount > 0),
-                  _navItem(CustomerTab.history, Icons.history, 'History'),
-                  _navItem(CustomerTab.profile, Icons.person, 'Profile'),
+                  _navItem(CustomerTab.history,
+                      Icons.history, 'History'),
+                  _navItem(CustomerTab.profile,
+                      Icons.person, 'Profile'),
                 ],
               ),
             ),
@@ -228,12 +169,13 @@ class _CustomerAppState extends State<CustomerApp> {
   }
 
   Widget _navItem(
-    CustomerTab tab,
-    IconData icon,
-    String label, {
-    bool showBadge = false,
-  }) {
+      CustomerTab tab,
+      IconData icon,
+      String label, {
+        bool showBadge = false,
+      }) {
     final isSelected = _activeTab == tab;
+
     return InkWell(
       onTap: () => setState(() => _activeTab = tab),
       child: Column(
@@ -245,7 +187,8 @@ class _CustomerAppState extends State<CustomerApp> {
               Icon(
                 icon,
                 size: 24,
-                color: isSelected ? AppColors.epairRed : AppColors.slate400,
+                color:
+                isSelected ? AppColors.epairRed : AppColors.slate400,
               ),
               if (showBadge)
                 Positioned(
@@ -266,10 +209,11 @@ class _CustomerAppState extends State<CustomerApp> {
           Text(
             label,
             style: TextStyle(
-              fontSize: 7,
-              fontWeight: FontWeight.w900,
-              letterSpacing: 1,
-              color: isSelected ? AppColors.epairRed : AppColors.slate400,
+              fontSize: 10,
+              fontWeight: FontWeight.w600,
+              color: isSelected
+                  ? AppColors.epairRed
+                  : AppColors.slate400,
             ),
           ),
         ],
